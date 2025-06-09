@@ -1,0 +1,8 @@
+.node {
+  /* background: #d567c8; */
+  stroke: #333;
+  stroke-width: 1.5px;
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+}

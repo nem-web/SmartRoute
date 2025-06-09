@@ -1,0 +1,260 @@
+import React, { useState, useRef, useEffect } from "react";
+import "./styles.css";
+
+const GraphCanvas = ({
+  nodes,
+  setNodes,
+  edges,
+  setEdges,
+  nodeId,
+  setNodeId,
+  shortestPath,
+  animationSpeed = 400, // Default to 300 if not provided
+  isDirected,
+  onNodeDoubleClick,
+}) => {
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [draggingNodeId, setDraggingNodeId] = useState(null);
+  const [editingEdge, setEditingEdge] = useState(null);
+  const canvasRef = useRef(null);
+  const [highlightedEdges, setHighlightedEdges] = useState([]);
+  const [highlightedNodes, setHighlightedNodes] = useState([]);
+
+  const visualDelay = 1000 - animationSpeed;
+
+  const getNodeById = (id) => nodes.find((n) => n.id === id);
+
+  const handleWeightChange = (index, value) => {
+    const weight = parseInt(value);
+    if (!isNaN(weight) && weight > 0) {
+      const updated = [...edges];
+      updated[index].weight = weight;
+      setEdges(updated);
+    }
+    setEditingEdge(null);
+  };
+
+  const handleCanvasClick = (e) => {
+    if (
+      e.target.classList.contains("node") ||
+      ["foreignObject", "INPUT", "line", "text"].includes(e.target.tagName)
+    )
+      return;
+
+    const rect = e.target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setNodes([...nodes, { id: nodeId, x, y }]);
+    setNodeId(nodeId + 1);
+  };
+
+  const handleNodeClick = (id) => {
+    if (selectedNode === null) {
+      setSelectedNode(id);
+    } else if (selectedNode !== id) {
+      setEdges([...edges, { from: selectedNode, to: id, weight: 1 }]);
+      setSelectedNode(null);
+    } else {
+      setSelectedNode(null);
+    }
+  };
+
+  const handleMouseDown = (e, id) => {
+    e.stopPropagation();
+    setDraggingNodeId(id);
+  };
+
+  const handleMouseMove = (e) => {
+    if (draggingNodeId !== null) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      setNodes((prev) =>
+        prev.map((n) => (n.id === draggingNodeId ? { ...n, x, y } : n))
+      );
+    }
+  };
+
+  const handleMouseUp = () => {
+    setDraggingNodeId(null);
+  };
+
+  const handleRightClick = (e, id) => {
+    e.preventDefault(); // prevent context menu
+
+    setNodes((prev) => prev.filter((n) => n.id !== id));
+    setEdges((prev) =>
+      prev.filter((edge) => edge.from !== id && edge.to !== id)
+    );
+    setSelectedNode(null);
+  };
+
+  // Highlight edges and nodes in the shortest path
+  useEffect(() => {
+    if (!shortestPath || shortestPath.length < 2){
+      setHighlightedEdges([]);
+      setHighlightedNodes([]);
+      return;
+    }
+
+    setHighlightedEdges([]);
+    setHighlightedNodes([]);
+
+    const newEdges = [];
+    const newNodes = [];
+
+    shortestPath.forEach((nodeId, index) => {
+      setTimeout(() => {
+        if (index > 0) {
+          newEdges.push({
+            from: shortestPath[index - 1],
+            to: nodeId,
+          });
+          setHighlightedEdges([...newEdges]);
+        }
+        newNodes.push(nodeId);
+        setHighlightedNodes([...newNodes]);
+      }, visualDelay * index); // speed: 300ms per node
+    });
+  }, [shortestPath, visualDelay]);
+
+
+  return (
+    <div
+      ref={canvasRef}
+      className="w-full h-full bg-gray-100 relative overflow-hidden"
+      onClick={handleCanvasClick}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
+      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <defs>
+          <marker
+            id="arrowhead"
+            markerWidth="10"
+            markerHeight="8"
+            refX="10"
+            refY="4"
+            orient="auto"
+            markerUnits="userSpaceOnUse"
+          >
+            <polygon points="0 0, 10 4, 0 8" fill="black" />
+          </marker>
+        </defs>
+        {edges.map((edge, idx) => {
+          const from = getNodeById(edge.from);
+          const to = getNodeById(edge.to);
+          if (!from || !to) return null;
+
+          const midX = (from.x + to.x) / 2;
+          const midY = (from.y + to.y) / 2;
+
+          const nodeRadius = 15;
+          const dx = to.x - from.x;
+          const dy = to.y - from.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+          const offsetX = (dx * nodeRadius) / len;
+          const offsetY = (dy * nodeRadius) / len;
+
+          return (
+            <g key={idx}>
+              <line
+                x1={from.x}
+                y1={from.y}
+                x2={to.x - offsetX}
+                y2={to.y - offsetY}
+                stroke={
+                  highlightedEdges.some(
+                    (e) =>
+                      (e.from === edge.from && e.to === edge.to) ||
+                      (e.from === edge.to && e.to === edge.from)
+                  )
+                    ? "orange"
+                    : "black"
+                }
+                strokeWidth={
+                  highlightedEdges.some(
+                    (e) =>
+                      (e.from === edge.from && e.to === edge.to) ||
+                      (e.from === edge.to && e.to === edge.from)
+                  )
+                    ? 4
+                    : 2
+                }
+                style={{ pointerEvents: "all", cursor: "pointer" }}
+                onDoubleClick={() => setEditingEdge(idx)}
+                markerEnd={isDirected ? "url(#arrowhead)" : null}
+              />
+
+              {editingEdge === idx ? (
+                <foreignObject
+                  x={midX - 15}
+                  y={midY - 10}
+                  width="30"
+                  height="20"
+                  style={{ pointerEvents: "all" }}
+                >
+                  <input
+                    autoFocus
+                    type="number"
+                    defaultValue={edge.weight}
+                    className="w-full h-full text-center text-xs border border-gray-400 rounded-sm outline-none bg-white"
+                    onBlur={(e) => handleWeightChange(idx, e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter")
+                        handleWeightChange(idx, e.target.value);
+                    }}
+                  />
+                </foreignObject>
+              ) : (
+                <text
+                  x={midX}
+                  y={midY}
+                  className="transition-transform duration-200 hover:scale-110 cursor-pointer"
+                  onDoubleClick={() => setEditingEdge(idx)}
+                  fill="red"
+                  fontSize="14"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                  style={{ pointerEvents: "all" }}
+                >
+                  {edge.weight}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+
+      {nodes.map((node) => (
+        <div
+          key={node.id}
+          className={`node absolute w-[30px] h-[30px] rounded-full flex items-center justify-center text-white font-bold cursor-pointer transition-all duration-300 select-none ${
+            highlightedNodes.includes(node.id)
+              ? "bg-[#f1c550]"
+              : selectedNode === node.id
+              ? "bg-[#4cf181]"
+              : "bg-[#007bff] hover:bg-[#0056b3] hover:scale-110"
+          }`}
+          style={{
+            top: node.y - 15 + "px",
+            left: node.x - 15 + "px",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleNodeClick(node.id);
+          }}
+          onContextMenu={(e) => handleRightClick(e, node.id)}
+          onMouseDown={(e) => handleMouseDown(e, node.id)}
+          onDoubleClick={() => onNodeDoubleClick && onNodeDoubleClick(node.id)}
+        >
+          {node.id}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default GraphCanvas;
