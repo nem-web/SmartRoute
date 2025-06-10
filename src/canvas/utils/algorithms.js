@@ -42,9 +42,17 @@ export function dijkstra(graph, startId, endId) {
     if (visited.has(currentNode)) continue; // skip if already finalized
     visited.add(currentNode); // mark as finalized
 
+    const prevNode = prev[currentNode];
+
+    // find neighbors for pink highlight
+    const neighbors = (graph[currentNode] || []).map(n => n.node);
+
     steps.push({
       queue: pq.snapshot(),
-      log: ` ${currentNode}`,
+      log: `Visiting ${currentNode}`,
+      currentNode: Number(currentNode),
+      prevNode: prevNode !== null ? Number(prevNode) : null,
+      neighbors: neighbors.map(Number),
     });
 
     for (const neighborData of graph[currentNode] || []) {

@@ -3,7 +3,12 @@ import Button from "@mui/material/Button";
 import { FaPlay, FaPause } from "react-icons/fa6";
 import { VscDebugRestart } from "react-icons/vsc";
 import GraphCanvas from "../GraphCanvas";
-import { astar, bfsShortestPath, buildGraph, dijkstra } from "../../utils/algorithms"; // Adjust path accordingly
+import {
+  astar,
+  bfsShortestPath,
+  buildGraph,
+  dijkstra,
+} from "../../utils/algorithms"; // Adjust path accordingly
 
 const Content = () => {
   const [algorithm, setAlgorithm] = useState("dijkstra");
@@ -32,6 +37,8 @@ const Content = () => {
 
   const [tempMessage, setTempMessage] = useState("");
   const tempMessageTimer = useRef(null);
+
+  const [stepMode, setStepMode] = useState(false); // false = auto, true = manual
 
   const handleNodeDoubleClick = (nodeId) => {
     if (!source) {
@@ -73,6 +80,13 @@ const Content = () => {
     currentStepRef.current = 0;
   };
 
+  const [currentHighlight, setCurrentHighlight] = useState({
+    node: null,
+    edge: null,
+    neighbors: [],
+    blink: false,
+  });
+
   const executeStep = () => {
     const steps = stepsRef.current;
     const i = currentStepRef.current;
@@ -83,10 +97,32 @@ const Content = () => {
         intervalRef.current = null;
       }
       setIsPlaying(false);
+      setCurrentHighlight({
+        node: null,
+        edge: null,
+        neighbors: [],
+        blink: false,
+      });
       return;
     }
 
     const currentStep = steps[i];
+    const { currentNode, prevNode, neighbors } = currentStep || {};
+
+    setCurrentHighlight((prev) => ({
+      node: currentNode != null ? { from: prevNode, to: currentNode } : null,
+      neighbors: neighbors || [],
+      blink: !prev.blink, // Toggle blink state
+    }));
+
+    // update logs
+    setLogMessages((prev) => [
+      ...prev,
+      currentStep.log || `Step ${i + 1}: No Log message`,
+    ]);
+
+    currentStepRef.current += 1;
+
     if (!currentStep) {
       console.error(`Step ${i} is undefined in steps array`);
       if (intervalRef.current) {
@@ -96,23 +132,17 @@ const Content = () => {
       setIsPlaying(false);
       return;
     }
-
-    const log = currentStep.log || `Step ${i + 1}: No log message`;
-
-    // Update logs
-    setLogMessages((prev) => [...prev, log]);
-    // setVisibleLogSteps((prev) => [...prev, log]);
-
-    currentStepRef.current = i + 1;
   };
 
   const handleStart = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
     if (!source || !destination) {
       alert("Please select both source and destination nodes");
       return;
     }
-
-    // const {steps, path} = result;
 
     // Reset everything first
     setLogMessages([]);
@@ -127,16 +157,13 @@ const Content = () => {
 
     try {
       let result;
-      if( algorithm === "bfs") {
+      if (algorithm === "bfs") {
         result = bfsShortestPath(graph, source, destination);
-      }
-      else if (algorithm === "dijkstra") {
+      } else if (algorithm === "dijkstra") {
         result = dijkstra(graph, source, destination);
-      }
-      else if (algorithm === "astar") {
-        result = astar(graph, source, destination);
-      }
-      else {
+      } else if (algorithm === "astar") {
+        result = astar(graph, source, destination, nodes);
+      } else {
         console.error("Unknown algorithm selected:", algorithm);
         alert("Error: Unknown algorithm selected");
         setIsPlaying(false);
@@ -155,10 +182,15 @@ const Content = () => {
       setTotalDistance(distance ?? null);
       stepsRef.current = steps;
 
-      // Start the animation
-      intervalRef.current = setInterval(() => {
+      if (!stepMode) {
+        // Automatic mode
+        intervalRef.current = setInterval(() => {
+          executeStep();
+        }, visualDelay);
+      } else {
+        // Manual step mode
         executeStep();
-      }, visualDelay);
+      }
     } catch (error) {
       console.error("Error running Dijkstra algorithm:", error);
       alert("Error occurred while running the algorithm");
@@ -272,21 +304,33 @@ const Content = () => {
               </select>
             </label>
 
-            <div className="flex gap-[.5rem] mb-[1rem]">
-              <Button
-                variant="contained"
-                className="bg-green-500 text-white px-4 py-2 rounded"
-                onClick={handleStart}
-                disabled={isPlaying}
-              >
-                Start
-              </Button>
-              <Button
-                onClick={handleReset}
-                className="bg-gray-300 text-gray-800 px-4 py-2 rounded !color-[#000]"
-              >
-                Reset
-              </Button>
+            <div className="flex flex-row items-center justify-between mb-[1rem]">
+              <div className="flex gap-[.5rem] mb-[1rem]">
+                <Button
+                  variant="contained"
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  onClick={handleStart}
+                  disabled={isPlaying}
+                >
+                  Start
+                </Button>
+                <Button
+                  onClick={handleReset}
+                  className="bg-gray-300 text-gray-800 px-4 py-2 rounded !color-[#000]"
+                >
+                  Reset
+                </Button>
+              </div>
+              <label className="flex items-center gap-[.4rem] mb-[.4rem] p-[.2rem]">
+                <input
+                  type="checkbox"
+                  checked={stepMode}
+                  onChange={() => setStepMode((prev) => !prev)}
+                  className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+                  disabled={isPlaying}
+                />
+                <span className="text-[1.3em]">Steps</span>
+              </label>
             </div>
 
             <div className="mb-4">
@@ -312,7 +356,11 @@ const Content = () => {
 
             <label className="block mb-[1rem]">
               <span className="text-gray-700">Algorithm</span>
-              <select className="mt-[.8rem] p-[.3rem] block w-full border-gray-300 rounded-[.2rem]" value={algorithm} onChange={e => setAlgorithm(e.target.value)}>
+              <select
+                className="mt-[.8rem] p-[.3rem] block w-full border-gray-300 rounded-[.2rem]"
+                value={algorithm}
+                onChange={(e) => setAlgorithm(e.target.value)}
+              >
                 <option value="dijkstra">Dijkstra</option>
                 <option value="bfs">BFS</option>
                 <option value="astar">A*</option>
@@ -372,6 +420,7 @@ const Content = () => {
               animationSpeed={animationSpeed}
               isDirected={isDirected}
               onNodeDoubleClick={handleNodeDoubleClick}
+              currentHighlight={currentHighlight}
             />
           </div>
         </div>
@@ -415,6 +464,15 @@ const Content = () => {
             >
               <VscDebugRestart className="w-[20px] h-[20px]" />
             </button>
+            <Button
+              onClick={() => {
+                if (stepMode && isPlaying) executeStep();
+              }}
+              className="bg-[#4cf181] hover:bg-[#fbd3ea] text-white px-4 py-2 rounded transition-all duration-200 shadow-md"
+              disabled={!stepMode || !isPlaying}
+            >
+              Next Step
+            </Button>
           </div>
 
           {/* Status and Progress */}

@@ -12,6 +12,7 @@ const GraphCanvas = ({
   animationSpeed = 400, // Default to 300 if not provided
   isDirected,
   onNodeDoubleClick,
+  currentHighlight = { node: null, edge: null, neighbors: [], blink: false },
 }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -93,7 +94,7 @@ const GraphCanvas = ({
 
   // Highlight edges and nodes in the shortest path
   useEffect(() => {
-    if (!shortestPath || shortestPath.length < 2){
+    if (!shortestPath || shortestPath.length < 2) {
       setHighlightedEdges([]);
       setHighlightedNodes([]);
       return;
@@ -119,7 +120,6 @@ const GraphCanvas = ({
       }, visualDelay * index); // speed: 300ms per node
     });
   }, [shortestPath, visualDelay]);
-
 
   return (
     <div
@@ -148,6 +148,30 @@ const GraphCanvas = ({
           const to = getNodeById(edge.to);
           if (!from || !to) return null;
 
+          // Highlight logic for blinking edge
+          let edgeColor = "black";
+          let edgeWidth = 2;
+          if (
+            currentHighlight.edge &&
+            ((edge.from === currentHighlight.edge.from &&
+              edge.to === currentHighlight.edge.to) ||
+              (!isDirected &&
+                edge.from === currentHighlight.edge.to &&
+                edge.to === currentHighlight.edge.from))
+          ) {
+            edgeColor = currentHighlight.blink ? "#ffe066" : "#f1c550";
+            edgeWidth = 6;
+          } else if (
+            highlightedEdges.some(
+              (e) =>
+                (e.from === edge.from && e.to === edge.to) ||
+                (e.from === edge.to && e.to === edge.from)
+            )
+          ) {
+            edgeColor = "orange";
+            edgeWidth = 4;
+          }
+
           const midX = (from.x + to.x) / 2;
           const midY = (from.y + to.y) / 2;
 
@@ -165,24 +189,8 @@ const GraphCanvas = ({
                 y1={from.y}
                 x2={to.x - offsetX}
                 y2={to.y - offsetY}
-                stroke={
-                  highlightedEdges.some(
-                    (e) =>
-                      (e.from === edge.from && e.to === edge.to) ||
-                      (e.from === edge.to && e.to === edge.from)
-                  )
-                    ? "orange"
-                    : "black"
-                }
-                strokeWidth={
-                  highlightedEdges.some(
-                    (e) =>
-                      (e.from === edge.from && e.to === edge.to) ||
-                      (e.from === edge.to && e.to === edge.from)
-                  )
-                    ? 4
-                    : 2
-                }
+                stroke={edgeColor}
+                strokeWidth={edgeWidth}
                 style={{ pointerEvents: "all", cursor: "pointer" }}
                 onDoubleClick={() => setEditingEdge(idx)}
                 markerEnd={isDirected ? "url(#arrowhead)" : null}
@@ -228,31 +236,48 @@ const GraphCanvas = ({
         })}
       </svg>
 
-      {nodes.map((node) => (
-        <div
-          key={node.id}
-          className={`node absolute w-[30px] h-[30px] rounded-full flex items-center justify-center text-white font-bold cursor-pointer transition-all duration-300 select-none ${
-            highlightedNodes.includes(node.id)
-              ? "bg-[#f1c550]"
-              : selectedNode === node.id
-              ? "bg-[#4cf181]"
-              : "bg-[#007bff] hover:bg-[#0056b3] hover:scale-110"
-          }`}
-          style={{
-            top: node.y - 15 + "px",
-            left: node.x - 15 + "px",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleNodeClick(node.id);
-          }}
-          onContextMenu={(e) => handleRightClick(e, node.id)}
-          onMouseDown={(e) => handleMouseDown(e, node.id)}
-          onDoubleClick={() => onNodeDoubleClick && onNodeDoubleClick(node.id)}
-        >
-          {node.id}
-        </div>
-      ))}
+      {nodes.map((node) => {
+        // Highlight logic for blinking node and neighbors
+        let nodeClass = "";
+        if (currentHighlight.node === node.id) {
+          nodeClass = currentHighlight.blink
+            ? "bg-[#f5f198] animate-pulse"
+            : "bg-[#f5eb26]";
+        } else if (
+          currentHighlight.neighbors &&
+          currentHighlight.neighbors.includes(node.id)
+        ) {
+          nodeClass = "bg-[#fc84c9]";
+        } else if (highlightedNodes.includes(node.id)) {
+          nodeClass = "bg-[#f95b06]";
+        } else if (selectedNode === node.id) {
+          nodeClass = "bg-[#4cf181]";
+        } else {
+          nodeClass = "bg-[#007bff] hover:bg-[#0056b3] hover:scale-110";
+        }
+
+        return (
+          <div
+            key={node.id}
+            className={`node absolute w-[30px] h-[30px] rounded-full flex items-center justify-center text-white font-bold cursor-pointer transition-all duration-300 select-none ${nodeClass}`}
+            style={{
+              top: node.y - 15 + "px",
+              left: node.x - 15 + "px",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNodeClick(node.id);
+            }}
+            onContextMenu={(e) => handleRightClick(e, node.id)}
+            onMouseDown={(e) => handleMouseDown(e, node.id)}
+            onDoubleClick={() =>
+              onNodeDoubleClick && onNodeDoubleClick(node.id)
+            }
+          >
+            {node.id}
+          </div>
+        );
+      })}
     </div>
   );
 };
