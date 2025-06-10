@@ -188,3 +188,89 @@ export class MinHeap {
   }
   
 }
+
+// ...existing code...
+
+// Heuristic: Euclidean distance (if nodes have x, y)
+function heuristic(nodeA, nodeB, nodeCoords) {
+  if (!nodeCoords[nodeA] || !nodeCoords[nodeB]) return 0;
+  const dx = nodeCoords[nodeA].x - nodeCoords[nodeB].x;
+  const dy = nodeCoords[nodeA].y - nodeCoords[nodeB].y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// A* Algorithm
+export function astar(graph, startId, endId, nodes = []) {
+  // Build a map of nodeId -> {x, y}
+  const nodeCoords = {};
+  nodes.forEach(n => nodeCoords[n.id] = { x: n.x, y: n.y });
+
+  const openSet = new MinHeap();
+  const cameFrom = {};
+  const gScore = {};
+  const fScore = {};
+  const steps = [];
+  const visited = new Set();
+
+  for (const node in graph) {
+    gScore[node] = Infinity;
+    fScore[node] = Infinity;
+  }
+  gScore[startId] = 0;
+  fScore[startId] = heuristic(startId, endId, nodeCoords);
+
+  openSet.insert([startId, fScore[startId]]);
+
+  while (!openSet.isEmpty()) {
+    const [current, ] = openSet.extractMin();
+
+    if (visited.has(current)) continue;
+    visited.add(current);
+
+    steps.push({
+      queue: openSet.snapshot(),
+      log: `Visiting ${current}`,
+    });
+
+    if (String(current) === String(endId)) break;
+
+    for (const neighborObj of graph[current] || []) {
+      const neighbor = neighborObj.node;
+      const tentative_gScore = gScore[current] + neighborObj.weight;
+      if (tentative_gScore < gScore[neighbor]) {
+        cameFrom[neighbor] = current;
+        gScore[neighbor] = tentative_gScore;
+        fScore[neighbor] = tentative_gScore + heuristic(neighbor, endId, nodeCoords);
+        openSet.insert([neighbor, fScore[neighbor]]);
+      }
+    }
+  }
+
+  // Reconstruct path
+  const path = [];
+  let current = endId;
+  while (current in cameFrom) {
+    path.unshift(Number(current));
+    current = cameFrom[current];
+  }
+  if (String(current) === String(startId)) {
+    path.unshift(Number(startId));
+  }
+
+  if (path.length === 0 || String(path[0]) !== String(startId)) {
+    return { steps, path: null, distance: null };
+  }
+
+  // Calculate total distance
+  let totalDistance = 0;
+  for (let i = 1; i < path.length; i++) {
+    const from = path[i - 1];
+    const to = path[i];
+    const edge = (graph[from] || []).find(e => String(e.node) === String(to));
+    totalDistance += edge ? edge.weight : 1;
+  }
+
+  return { steps, path, distance: totalDistance };
+}
+
+

@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import { FaPlay, FaPause } from "react-icons/fa6";
 import { VscDebugRestart } from "react-icons/vsc";
 import GraphCanvas from "../GraphCanvas";
-import { bfsShortestPath, buildGraph, dijkstra } from "../../utils/algorithms"; // Adjust path accordingly
+import { astar, bfsShortestPath, buildGraph, dijkstra } from "../../utils/algorithms"; // Adjust path accordingly
 
 const Content = () => {
   const [algorithm, setAlgorithm] = useState("dijkstra");
@@ -134,9 +134,7 @@ const Content = () => {
         result = dijkstra(graph, source, destination);
       }
       else if (algorithm === "astar") {
-        alert("A* algorithm is not implemented yet.");
-        setIsPlaying(false);
-        return;
+        result = astar(graph, source, destination);
       }
       else {
         console.error("Unknown algorithm selected:", algorithm);
