@@ -179,10 +179,10 @@ const GraphCanvas = ({
                   >
                     <TableHead>
                       <TableRow>
-                        <TableCell>Node</TableCell>
-                        <TableCell align="center">Distance</TableCell>
-                        <TableCell align="center">Parent&nbsp;(g)</TableCell>
-                        <TableCell align="center">Neighbors&nbsp;(g)</TableCell>
+                        <TableCell className="!font-[600]">Node</TableCell>
+                        <TableCell align="center" className="!font-[600]">Distance</TableCell>
+                        <TableCell align="center" className="!font-[600]">Parent</TableCell>
+                        <TableCell align="center" className="!font-[600]">Neighbors</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
