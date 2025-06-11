@@ -50,13 +50,16 @@ Built for **learners, educators, and curious minds** who want to explore how sho
 
 ### 🚧 In Progress
 
-- DFS, Bellman-Ford, Floyd-Warshall visualizations
-- Enhanced heuristics and options for A* algorithm
-- Export/import of graph data
-- More customization options for node/edge appearance
-- Performance optimizations for large graphs
-- Accessibility improvements
-- Improved error handling and user guidance
+| Feature                       | Progress              |
+|------------------------------|-----------------------|
+| DFS, Bellman-Ford, Floyd-Warshall | ![70%](https://img.shields.io/badge/progress-70%25-blue) |
+| Enhanced A* Heuristics       | ![60%](https://img.shields.io/badge/progress-60%25-green) |
+| Export / Import Graph        | ![20%](https://img.shields.io/badge/progress-20%25-yellow) |
+| Custom Node/Edge Appearance  | ![60%](https://img.shields.io/badge/progress-60%25-pink) |
+| Performance Optimizations    | ![70%](https://img.shields.io/badge/progress-70%25-purple) |
+| Accessibility Improvements   | ![20%](https://img.shields.io/badge/progress-20%25-lightgrey) |
+| Better Error Handling        | ![60%](https://img.shields.io/badge/progress-60%25-cyan) |
+
 
 ---
 
