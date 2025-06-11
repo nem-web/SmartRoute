@@ -12,18 +12,11 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
+import { dijkstraTable, buildGraph } from "../../utils/algorithms";
+
 function createData(Node, Distance, Parent, Neighbors) {
   return { Node, Distance, Parent, Neighbors };
 }
-
-const rows = [
-  createData(1, 15, 6, [2, 4]),
-  createData(2, 15, 6, [2, 4]),
-  createData(3, 15, 6, [2, 4]),
-  createData(4, 15, 6, [2, 4]),
-  createData(5, 15, 6, [2, 4]),
-  createData(6, 15, 6, [2, 4]),
-];
 
 const GraphCanvas = ({
   nodes,
@@ -37,6 +30,7 @@ const GraphCanvas = ({
   isDirected,
   onNodeDoubleClick,
   currentHighlight = { node: null, edge: null, neighbors: [], blink: false },
+  dijkstraRows = [],
 }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -156,6 +150,10 @@ const GraphCanvas = ({
     });
   }, [shortestPath, visualDelay]);
 
+  const graph = buildGraph(nodes, edges, isDirected);
+
+  // console.log(dijkstraRows);
+
   return (
     <>
       <div className="flex justify-end p-2">
@@ -170,8 +168,14 @@ const GraphCanvas = ({
         <Popper id={id} open={open} anchorEl={anchorEl} transition>
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={350}>
-              <Box sx={{ border: 1, p: 1, bgcolor: "background.paper" }} className="w-[380px]">
-                <TableContainer component={Paper} className="max-h-[400px] overflow-y-auto rounded-[.6rem]">
+              <Box
+                sx={{ border: 1, p: 1, bgcolor: "background.paper" }}
+                className="w-[380px]"
+              >
+                <TableContainer
+                  component={Paper}
+                  className="max-h-[400px] overflow-y-auto rounded-[.6rem]"
+                >
                   <Table
                     sx={{ minWidth: 300 }}
                     size="small"
@@ -180,25 +184,35 @@ const GraphCanvas = ({
                     <TableHead>
                       <TableRow>
                         <TableCell className="!font-[600]">Node</TableCell>
-                        <TableCell align="center" className="!font-[600]">Distance</TableCell>
-                        <TableCell align="center" className="!font-[600]">Parent</TableCell>
-                        <TableCell align="center" className="!font-[600]">Neighbors</TableCell>
+                        <TableCell align="center" className="!font-[600]">
+                          Distance
+                        </TableCell>
+                        <TableCell align="center" className="!font-[600]">
+                          Parent
+                        </TableCell>
+                        <TableCell align="center" className="!font-[600]">
+                          Neighbors
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
+                      {dijkstraRows.map((row) => (
                         <TableRow
-                          key={row.Node}
+                          key={row.node}
                           sx={{
                             "&:last-child td, &:last-child th": { border: 0 },
                           }}
                         >
-                          <TableCell component="th" scope="row">
-                            {row.Node}
+                          <TableCell component="th" scope="row" align="center">
+                            {row.node}
                           </TableCell>
-                          <TableCell align="center">{row.Distance}</TableCell>
-                          <TableCell align="center">{row.Parent}</TableCell>
-                          <TableCell align="center">{row.Neighbors}</TableCell>
+                          <TableCell align="center">{row.distance}</TableCell>
+                          <TableCell align="center">{row.parent}</TableCell>
+                          <TableCell align="start">
+                            {row.neighbors.length
+                              ? row.neighbors.join(", ")
+                              : "-"}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

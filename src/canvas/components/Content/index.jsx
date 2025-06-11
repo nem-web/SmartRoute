@@ -22,6 +22,8 @@ const Content = () => {
   const [logMessages, setLogMessages] = useState([]);
   const [animationIndex, setAnimationIndex] = useState(0);
 
+  const [currentTable, setCurrentTable] = useState([]);
+
   const [totalDistance, setTotalDistance] = useState(null);
 
   const [isDirected, setIsDirected] = useState(false);
@@ -91,6 +93,7 @@ const Content = () => {
     const steps = stepsRef.current;
     const i = currentStepRef.current;
 
+
     if (i >= steps.length) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -105,8 +108,9 @@ const Content = () => {
       });
       return;
     }
-
     const currentStep = steps[i];
+    setCurrentTable(currentStep.table || []);
+
     const { currentNode, prevNode, neighbors } = currentStep || {};
 
     setCurrentHighlight((prev) => ({
@@ -421,6 +425,7 @@ const Content = () => {
               isDirected={isDirected}
               onNodeDoubleClick={handleNodeDoubleClick}
               currentHighlight={currentHighlight}
+              dijkstraRows={currentTable}
             />
           </div>
         </div>

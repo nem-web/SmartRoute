@@ -1,4 +1,12 @@
 // src/utils/graphUtils.js
+function buildDijkstraTable(graph, dist, prev) {
+  return Object.keys(graph).map((node) => ({
+    node: Number(node),
+    distance: dist[node] === Infinity ? "∞" : dist[node],
+    parent: prev[node] !== null ? Number(prev[node]) : "-",
+    neighbors: (graph[node] || []).map(n => Number(n.node)),
+  }));
+}
 
 export function buildGraph(nodes, edges, isDirected = false) {
   const graph = {};
@@ -17,6 +25,46 @@ export function buildGraph(nodes, edges, isDirected = false) {
 
   return graph;
 }
+
+// dijkstra table
+export function dijkstraTable(graph, startId) {
+  const dist = {};
+  const prev = {};
+  const pq = new MinHeap();
+  const visited = new Set();
+
+  for (const node in graph) {
+    dist[node] = Infinity;
+    prev[node] = null;
+  }
+  dist[startId] = 0;
+  pq.insert([startId, 0]);
+
+  while (!pq.isEmpty()) {
+    const [currentNode, currentDist] = pq.extractMin();
+    if (visited.has(currentNode)) continue;
+    visited.add(currentNode);
+
+    for (const neighborData of graph[currentNode] || []) {
+      const { node: neighbor, weight } = neighborData;
+      const newDist = dist[currentNode] + weight;
+      if (newDist < dist[neighbor]) {
+        dist[neighbor] = newDist;
+        prev[neighbor] = currentNode;
+        pq.insert([neighbor, newDist]);
+      }
+    }
+  }
+
+  // Build the table
+  return Object.keys(graph).map((node) => ({
+    node: Number(node),
+    distance: dist[node] === Infinity ? "∞" : dist[node],
+    parent: prev[node] !== null ? Number(prev[node]) : "-",
+    neighbors: (graph[node] || []).map(n => Number(n.node)),
+  }));
+}
+
 
 
 // Dijkstra's Algorithm for Shortest Path
@@ -52,7 +100,8 @@ export function dijkstra(graph, startId, endId) {
       log: `Visiting ${currentNode}`,
       currentNode: Number(currentNode),
       prevNode: prevNode !== null ? Number(prevNode) : null,
-      neighbors: neighbors.map(Number),
+      neighbors: (graph[currentNode] || []).map(n => Number(n.node)),
+      table: buildDijkstraTable(graph, { ...dist }, { ...prev }),
     });
 
     for (const neighborData of graph[currentNode] || []) {
