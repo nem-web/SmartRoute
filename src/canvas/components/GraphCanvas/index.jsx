@@ -11,6 +11,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 
 import { dijkstraTable, buildGraph } from "../../utils/algorithms";
 
@@ -193,7 +194,6 @@ const GraphCanvas = ({
                     cursor: "pointer",
                     fontSize: "1.2rem",
                     color: "#c61203",
-
                   }}
                   areia-label="Close popup"
                   className="rounded-[100%] !font-[600] hover:!bg-[#f1c550] hover:text-[#000] transition-colors duration-300"
@@ -229,7 +229,9 @@ const GraphCanvas = ({
                           <TableRow
                             key={row.node}
                             sx={{
-                              "&:last-child td, &:last-child th": { border: 0 },
+                              "&:last-child td, &:last-child th": {
+                                border: 0,
+                              },
                             }}
                           >
                             <TableCell

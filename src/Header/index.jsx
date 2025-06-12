@@ -77,6 +77,17 @@ export const Header = ({ setShowPopup, setAnchorEl, setPopupType }) => {
             >
               Show Logs
             </Button>
+            <Button
+              className="!bg-[#8ef3ec] !text-[#000] !hover:!bg-[#f1c550] !hover:!text-[#000] !rounded-full !px-4 !py-2 !text-sm"
+              type="button"
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setPopupType("logs");
+                setShowPopup(true);
+              }}
+            >
+              Show queue
+            </Button>
           </div>
         </div>
         <hr />
