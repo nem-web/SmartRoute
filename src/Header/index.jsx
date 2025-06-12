@@ -4,6 +4,7 @@ import { FaGithub } from "react-icons/fa";
 import { LiaToggleOffSolid } from "react-icons/lia";
 import { LiaToggleOnSolid } from "react-icons/lia";
 import "./style.css";
+import { Button } from "@mui/material";
 
 export const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -38,6 +39,19 @@ export const Header = () => {
               )}
             </div>
           </div>
+        </div>
+
+        <hr />
+        <div className="nav">
+          <Button
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
+            className="!capitalize !bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Reset & Reload
+          </Button>
         </div>
         <hr />
       </div>

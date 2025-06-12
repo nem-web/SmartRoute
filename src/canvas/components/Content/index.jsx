@@ -42,6 +42,27 @@ const Content = () => {
 
   const [stepMode, setStepMode] = useState(false); // false = auto, true = manual
 
+  useEffect(() => {
+    const saved = localStorage.getItem("smartroute-graph");
+    if (saved) {
+      try {
+        const { nodes, edges, nodeId } = JSON.parse(saved);
+        // Validate loaded data
+        console.log("Loaded nodes:", nodes);
+        console.log("Loaded edges:", edges);
+        console.log("Loaded nodeId:", nodeId);
+        setNodes(nodes || []);
+        setEdges(edges || []);
+        setNodeId(nodeId ?? 1);
+      } catch (e) {
+        // if corrupted data, reset to empty
+        setNodes([]);
+        setEdges([]);
+        setNodeId(1);
+      }
+    }
+  }, []);
+
   const handleNodeDoubleClick = (nodeId) => {
     if (!source) {
       setSource(nodeId);
@@ -92,7 +113,6 @@ const Content = () => {
   const executeStep = () => {
     const steps = stepsRef.current;
     const i = currentStepRef.current;
-
 
     if (i >= steps.length) {
       if (intervalRef.current) {
@@ -232,6 +252,14 @@ const Content = () => {
       handleStart();
     }
   };
+
+  useEffect(() => {
+    // saving in local storage
+    localStorage.setItem(
+      "smartroute-graph",
+      JSON.stringify({ nodes, edges, nodeId })
+    );
+  }, [nodes, edges, nodeId]);
 
   return (
     <div className="container w-[98%] m-[1rem]">
