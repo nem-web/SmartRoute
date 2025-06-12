@@ -6,7 +6,7 @@ import { LiaToggleOnSolid } from "react-icons/lia";
 import "./style.css";
 import { Button } from "@mui/material";
 
-export const Header = ({ setShowTable, setAnchorEl }) => {
+export const Header = ({ setShowPopup, setAnchorEl, setPopupType }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Update body class when theme changes
@@ -60,7 +60,8 @@ export const Header = ({ setShowTable, setAnchorEl }) => {
               type="button"
               onClick={(e) => {
                 setAnchorEl(e.currentTarget);
-                setShowTable((prev) => !prev);
+                setPopupType("table");
+                setShowPopup(true);
               }}
             >
               Show Table
@@ -70,7 +71,8 @@ export const Header = ({ setShowTable, setAnchorEl }) => {
               type="button"
               onClick={(e) => {
                 setAnchorEl(e.currentTarget);
-                setShowTable((prev) => !prev);
+                setPopupType("logs");
+                setShowPopup(true);
               }}
             >
               Show Logs

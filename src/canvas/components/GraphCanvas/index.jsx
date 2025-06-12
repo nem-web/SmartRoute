@@ -31,10 +31,11 @@ const GraphCanvas = ({
   onNodeDoubleClick,
   currentHighlight = { node: null, edge: null, neighbors: [], blink: false },
   dijkstraRows = [],
-  showTable,
+  showPopup,
   anchorEl,
-  setShowTable,
-  setAnchorEl,
+  setShowPopup,
+  popupType,
+  logMessages,
 }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -149,8 +150,8 @@ const GraphCanvas = ({
     <>
       <div className="flex p-[.4rem] ">
         <Popper
-          id={showTable ? "transition-popper" : undefined}
-          open={showTable}
+          id={showPopup ? "transition-popper" : undefined}
+          open={showPopup}
           anchorEl={anchorEl}
           placement="bottom-start"
           transition
@@ -177,55 +178,95 @@ const GraphCanvas = ({
                   bgcolor: "background.paper",
                   maxWidth: "95vw",
                   width: "min(380px, 95vw)",
+                  position: "relative",
                 }}
                 className="w-[380px]"
               >
-                <TableContainer
-                  component={Paper}
-                  className="max-h-[400px] overflow-y-auto rounded-[.6rem]"
+                <button
+                  onClick={() => setShowPopup(false)}
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    background: "#d8dada",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "1.2rem",
+                    color: "#c61203",
+
+                  }}
+                  areia-label="Close popup"
+                  className="rounded-[100%] !font-[600] hover:!bg-[#f1c550] hover:text-[#000] transition-colors duration-300"
                 >
-                  <Table
-                    sx={{ minWidth: 300 }}
-                    size="small"
-                    aria-label="a dense table"
+                  x
+                </button>
+                {popupType === "table" ? (
+                  <TableContainer
+                    component={Paper}
+                    className="max-h-[400px] overflow-y-auto rounded-[.6rem]"
                   >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell className="!font-[600]">Node</TableCell>
-                        <TableCell align="center" className="!font-[600]">
-                          Distance
-                        </TableCell>
-                        <TableCell align="center" className="!font-[600]">
-                          Parent
-                        </TableCell>
-                        <TableCell align="center" className="!font-[600]">
-                          Neighbors
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {dijkstraRows.map((row) => (
-                        <TableRow
-                          key={row.node}
-                          sx={{
-                            "&:last-child td, &:last-child th": { border: 0 },
-                          }}
-                        >
-                          <TableCell component="th" scope="row" align="center">
-                            {row.node}
+                    <Table
+                      sx={{ minWidth: 300 }}
+                      size="small"
+                      aria-label="a dense table"
+                    >
+                      <TableHead>
+                        <TableRow>
+                          <TableCell className="!font-[600]">Node</TableCell>
+                          <TableCell align="center" className="!font-[600]">
+                            Distance
                           </TableCell>
-                          <TableCell align="center">{row.distance}</TableCell>
-                          <TableCell align="center">{row.parent}</TableCell>
-                          <TableCell align="start">
-                            {row.neighbors.length
-                              ? row.neighbors.join(", ")
-                              : "-"}
+                          <TableCell align="center" className="!font-[600]">
+                            Parent
+                          </TableCell>
+                          <TableCell align="center" className="!font-[600]">
+                            Neighbors
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                      </TableHead>
+                      <TableBody>
+                        {dijkstraRows.map((row) => (
+                          <TableRow
+                            key={row.node}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              align="center"
+                            >
+                              {row.node}
+                            </TableCell>
+                            <TableCell align="center">{row.distance}</TableCell>
+                            <TableCell align="center">{row.parent}</TableCell>
+                            <TableCell align="start">
+                              {row.neighbors.length
+                                ? row.neighbors.join(", ")
+                                : "-"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                ) : (
+                  <Box className="max-h-[400px] overflow-y-auto p-[.3rem]">
+                    <h4 className="font-bold mb-[.2rem]">Logs</h4>
+                    <ul className="text-xs">
+                      {logMessages.length === 0 ? (
+                        <li className="text-gray-400">No logs yet.</li>
+                      ) : (
+                        logMessages.map((msg, idx) => (
+                          <li key={idx} className="mb-[.2rem]">
+                            {msg}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </Box>
+                )}
               </Box>
             </Fade>
           )}

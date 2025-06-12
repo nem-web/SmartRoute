@@ -43,8 +43,9 @@ const Content = () => {
 
   const [stepMode, setStepMode] = useState(false); // false = auto, true = manual
 
-  const [showTable, setShowTable] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [popupType, setPopupType] = useState("table");
 
   useEffect(() => {
     const saved = localStorage.getItem("smartroute-graph");
@@ -263,7 +264,11 @@ const Content = () => {
 
   return (
     <>
-      <Header setShowTable={setShowTable} setAnchorEl={setAnchorEl} />
+      <Header
+        setShowPopup={setShowPopup}
+        setAnchorEl={setAnchorEl}
+        setPopupType={setPopupType}
+      />
       <div className="container w-[98%] m-[1rem]">
         <div className="min-h-screen bg-white text-gray-900 p-6">
           <div className="max-w-7xl mx-auto flex gap-6">
@@ -457,10 +462,11 @@ const Content = () => {
                 onNodeDoubleClick={handleNodeDoubleClick}
                 currentHighlight={currentHighlight}
                 dijkstraRows={currentTable}
-                showTable={showTable}
+                showPopup={showPopup}
                 anchorEl={anchorEl}
-                setShowTable={setShowTable}
-                setAnchorEl={setAnchorEl}
+                setShowPopup={setShowPopup}
+                popupType={popupType}
+                logMessages={logMessages}
               />
             </div>
           </div>
