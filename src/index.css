@@ -11,3 +11,7 @@ body.dark-theme {
   background-color: #121212;
   color: white;
 }
+
+body {
+  overflow-x: hidden;
+}

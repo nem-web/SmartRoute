@@ -31,6 +31,10 @@ const GraphCanvas = ({
   onNodeDoubleClick,
   currentHighlight = { node: null, edge: null, neighbors: [], blink: false },
   dijkstraRows = [],
+  showTable,
+  anchorEl,
+  setShowTable,
+  setAnchorEl,
 }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -42,17 +46,6 @@ const GraphCanvas = ({
   const visualDelay = 1000 - animationSpeed;
 
   const getNodeById = (id) => nodes.find((n) => n.id === id);
-
-  const [open, setOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-    setOpen((previousOpen) => !previousOpen);
-  };
-
-  const canBeOpen = open && Boolean(anchorEl);
-  const id = canBeOpen ? "transition-popper" : undefined;
 
   const handleWeightChange = (index, value) => {
     const weight = parseInt(value);
@@ -152,24 +145,39 @@ const GraphCanvas = ({
 
   const graph = buildGraph(nodes, edges, isDirected);
 
-  // console.log(dijkstraRows);
-
   return (
     <>
-      <div className="flex justify-end p-2">
-        <Button
-          className="!bg-[#8ef3ec] !text-[#000] !hover:!bg-[#f1c550] !hover:!text-[#000] !rounded-full !px-4 !py-2 !text-sm"
-          aria-describedby={id}
-          type="button"
-          onClick={handleClick}
+      <div className="flex p-[.4rem] ">
+        <Popper
+          id={showTable ? "transition-popper" : undefined}
+          open={showTable}
+          anchorEl={anchorEl}
+          placement="bottom-start"
+          transition
+          modifiers={[
+            {
+              name: "preventOverflow",
+              options: {
+                boundary: "window",
+                padding: 8,
+              },
+            },
+            {
+              name: "flip",
+              enabled: true,
+            },
+          ]}
         >
-          Show Logs
-        </Button>
-        <Popper id={id} open={open} anchorEl={anchorEl} transition>
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={350}>
               <Box
-                sx={{ border: 1, p: 1, bgcolor: "background.paper" }}
+                sx={{
+                  border: 1,
+                  p: 1,
+                  bgcolor: "background.paper",
+                  maxWidth: "95vw",
+                  width: "min(380px, 95vw)",
+                }}
                 className="w-[380px]"
               >
                 <TableContainer

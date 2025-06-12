@@ -6,7 +6,7 @@ import { LiaToggleOnSolid } from "react-icons/lia";
 import "./style.css";
 import { Button } from "@mui/material";
 
-export const Header = () => {
+export const Header = ({ setShowTable, setAnchorEl }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Update body class when theme changes
@@ -42,16 +42,40 @@ export const Header = () => {
         </div>
 
         <hr />
-        <div className="nav">
-          <Button
-            onClick={() => {
-              localStorage.clear();
-              window.location.reload();
-            }}
-            className="!capitalize !bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Reset & Reload
-          </Button>
+        <div className="nav flex justify-between items-center m-[10px]">
+          <div className="left-btns">
+            <Button
+              onClick={() => {
+                localStorage.clear();
+                window.location.reload();
+              }}
+              className="!capitalize !bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Reset & Reload
+            </Button>
+          </div>
+          <div className="right-btns flex justify-end items-center gap-[.8rem]">
+            <Button
+              className="!bg-[#8ef3ec] !text-[#000] !hover:!bg-[#f1c550] !hover:!text-[#000] !rounded-full !px-4 !py-2 !text-sm"
+              type="button"
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setShowTable((prev) => !prev);
+              }}
+            >
+              Show Table
+            </Button>
+            <Button
+              className="!bg-[#8ef3ec] !text-[#000] !hover:!bg-[#f1c550] !hover:!text-[#000] !rounded-full !px-4 !py-2 !text-sm"
+              type="button"
+              onClick={(e) => {
+                setAnchorEl(e.currentTarget);
+                setShowTable((prev) => !prev);
+              }}
+            >
+              Show Logs
+            </Button>
+          </div>
         </div>
         <hr />
       </div>
