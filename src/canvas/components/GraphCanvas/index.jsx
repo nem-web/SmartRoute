@@ -37,6 +37,8 @@ const GraphCanvas = ({
   setShowPopup,
   popupType,
   logMessages,
+  queue,
+  fullQueue,
 }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -253,7 +255,7 @@ const GraphCanvas = ({
                       </TableBody>
                     </Table>
                   </TableContainer>
-                ) : (
+                ) : popupType === "logs" ? (
                   <Box className="max-h-[400px] overflow-y-auto p-[.3rem]">
                     <h4 className="font-bold mb-[.2rem]">Logs</h4>
                     <ul className="text-xs">
@@ -263,6 +265,23 @@ const GraphCanvas = ({
                         logMessages.map((msg, idx) => (
                           <li key={idx} className="mb-[.2rem]">
                             {msg}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </Box>
+                ) : (
+                  <Box className="max-h-[400px] overflow-y-auto p-[.3rem]">
+                    <h4 className="font-bold mb-[.2rem]">Priority queue</h4>
+                    <ul className="text-xs">
+                      {queue.length === 0 ? (
+                        <li className="text-gray-400">Queue is empty.</li>
+                      ) : (
+                        queue.map((item, idx) => (
+                          <li key={idx} className="mb-[.2rem]">
+                            {typeof item === "object"
+                              ? JSON.stringify(item)
+                              : String(item)}
                           </li>
                         ))
                       )}

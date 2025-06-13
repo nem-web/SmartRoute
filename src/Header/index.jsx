@@ -82,7 +82,7 @@ export const Header = ({ setShowPopup, setAnchorEl, setPopupType }) => {
               type="button"
               onClick={(e) => {
                 setAnchorEl(e.currentTarget);
-                setPopupType("logs");
+                setPopupType("priority");
                 setShowPopup(true);
               }}
             >

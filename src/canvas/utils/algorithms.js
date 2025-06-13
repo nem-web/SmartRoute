@@ -95,15 +95,6 @@ export function dijkstra(graph, startId, endId) {
     // find neighbors for pink highlight
     const neighbors = (graph[currentNode] || []).map(n => n.node);
 
-    steps.push({
-      queue: pq.snapshot(),
-      log: `Visiting ${currentNode}`,
-      currentNode: Number(currentNode),
-      prevNode: prevNode !== null ? Number(prevNode) : null,
-      neighbors: (graph[currentNode] || []).map(n => Number(n.node)),
-      table: buildDijkstraTable(graph, { ...dist }, { ...prev }),
-    });
-
     for (const neighborData of graph[currentNode] || []) {
       const { node: neighbor, weight } = neighborData;
       const newDist = dist[currentNode] + weight;
@@ -114,6 +105,15 @@ export function dijkstra(graph, startId, endId) {
         // ⛔️ Don't log here, only log when a node is *visited* (i.e., extracted)
       }
     }
+
+    steps.push({
+      queue: pq.snapshot(),
+      log: `Visiting ${currentNode}`,
+      currentNode: Number(currentNode),
+      prevNode: prevNode !== null ? Number(prevNode) : null,
+      neighbors: (graph[currentNode] || []).map(n => Number(n.node)),
+      table: buildDijkstraTable(graph, { ...dist }, { ...prev }),
+    });
   }
 
   // Reconstruct path
@@ -146,6 +146,7 @@ export function bfsShortestPath(graph, startId, endId) {
     steps.push({
       queue: queue.map(p => p.join("→")),
       log: `Visiting ${node}`,
+      queue: pq.toArray(),
     });
 
     if (String(node) === String(endId)) {
@@ -237,8 +238,10 @@ export class MinHeap {
   }
 
   snapshot() {
-    return this.heap.map(([node, dist]) => `${node}(${dist})`);
-  }
+  return [...this.heap]
+    .sort((a, b) => a[1] - b[1])
+    .map(([node, dist]) => `${node}(${dist})`);
+}
 
   toArray() {
     return this.heap.map(([id, dist]) => `${id}(${dist})`);

@@ -24,8 +24,11 @@ const Content = () => {
   const [animationIndex, setAnimationIndex] = useState(0);
 
   const [currentTable, setCurrentTable] = useState([]);
+  const [fullPriorityQueue, setFullPriorityQueue] = useState([]);
 
   const [totalDistance, setTotalDistance] = useState(null);
+
+  const [currentQueue, setCurrentQueue] = useState([]);
 
   const [isDirected, setIsDirected] = useState(false);
 
@@ -131,6 +134,14 @@ const Content = () => {
     }
     const currentStep = steps[i];
     setCurrentTable(currentStep.table || []);
+    setCurrentQueue(currentStep.queue || []);
+    setFullPriorityQueue((prev) => {
+      const current = currentStep.queue || [];
+      const newItems = current.filter(
+        (item) => !prev.some((p) => p.node === item.node)
+      );
+      return [...prev, ...newItems];
+    });
 
     const { currentNode, prevNode, neighbors } = currentStep || {};
 
@@ -467,6 +478,8 @@ const Content = () => {
                 setShowPopup={setShowPopup}
                 popupType={popupType}
                 logMessages={logMessages}
+                queue={currentQueue}
+                fullQueue={fullPriorityQueue}
               />
             </div>
           </div>
