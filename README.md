@@ -7,15 +7,56 @@
 [![Vite](https://img.shields.io/badge/Powered%20by-Vite-purple)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/Styled%20with-TailwindCSS-38bdf8)](https://tailwindcss.com/)
 
+**Live Demo:** https://smart-route-nem.netlify.app/
+
+---
+
+## ✨ New: Future Expansions
+
+We plan to improve SmartRoute with the following features:
+
+### ✅ Short-Term
+
+- DFS, Bellman-Ford, Floyd-Warshall algorithms
+- Graph import/export support (JSON, image)
+- Custom node/edge styles and labels
+- Improved error handling and performance
+
+### ⏳ Long-Term (step-by-step visualization)
+
+- Step-by-step mode for **every supported algorithm**
+- Animation queue with timeline scrubbing
+- History/Undo support for graph building
+- Mobile-first layout optimization
+- Advanced heuristics support in A\*
+- User-created example graph templates
+
+If you have an idea or improved version:
+
+> ✨ **Please submit a pull request!**
+
+---
+
+## 📉 Known Bugs / Issues
+
+| Bug                                          | Description                          |
+| -------------------------------------------- | ------------------------------------ |
+| ❌ Refresh crash on non-root routes          | Fix with `_redirects` file (SPA)     |
+| ❌ Edge cases in A\* (missing coordinates)   | Heuristic fallback needed            |
+| ❌ Invalid weight inputs crash edge editor   | Input validation in progress         |
+| ❌ Table crash if `neighbors` isn't an array | Fixed, but handle nulls in all views |
+
+Please report new bugs via [Issues](https://github.com/nem-web/SmartRoute/issues)
+
 ---
 
 ## 🚀 What is SmartRoute?
 
 **SmartRoute** is an interactive web application for visualizing and understanding graph algorithms like:
 
-- 📌 **Dijkstra's Algorithm**  
-- 🔄 **Breadth-First Search (BFS)**  
-- ✨ **A\* Pathfinding**  
+- 📌 **Dijkstra's Algorithm**
+- 🔄 **Breadth-First Search (BFS)**
+- ✨ **A\* Pathfinding**
 
 Built for **learners, educators, and curious minds** who want to explore how shortest path algorithms really work—step by step.
 
@@ -25,8 +66,8 @@ Built for **learners, educators, and curious minds** who want to explore how sho
 
 - 🎨 **Interactive Graph Editor** – Add, drag, and link nodes visually.
 - 🔁 **Directed & Undirected Graphs** – Easily toggle graph types.
-- 🧠 **Multiple Algorithms** – Choose from Dijkstra, BFS, and A*.
-- 🎬 **Step-by-Step Animations** – Watch the algorithm unfold in real time or at your own pace.
+- 🧠 **Multiple Algorithms** – Choose from Dijkstra, BFS, and A\*.
+- 🎮 **Step-by-Step Animations** – Watch the algorithm unfold in real time or at your own pace.
 - 📏 **Path & Distance Display** – Clearly shows results of the shortest path.
 - 💬 **Instant Node Feedback** – Get quick messages when selecting source/destination nodes.
 - 📱 **Responsive UI** – Built with React + Tailwind CSS for a clean and modern interface.
@@ -37,42 +78,41 @@ Built for **learners, educators, and curious minds** who want to explore how sho
 
 ### ✅ Completed
 
-| Feature                        | Status   |
-|---------------------------------|----------|
-| Dijkstra Visualization          | ✅ Done  |
-| BFS Visualization               | ✅ Done  |
-| A* Algorithm                    | ✅ Done  |
-| Node/Edge Editor                | ✅ Done  |
-| Directed/Undirected Mode        | ✅ Done  |
-| Step & Auto Play Mode           | ✅ Done  |
-| Distance Display                | ✅ Done  |
-| Source/Destination Selector     | ✅ Done  |
+| Feature                     | Status  |
+| --------------------------- | ------- |
+| Dijkstra Visualization      | ✅ Done |
+| BFS Visualization           | ✅ Done |
+| A\* Algorithm               | ✅ Done |
+| Node/Edge Editor            | ✅ Done |
+| Directed/Undirected Mode    | ✅ Done |
+| Step & Auto Play Mode       | ✅ Done |
+| Distance Display            | ✅ Done |
+| Source/Destination Selector | ✅ Done |
 
 ### 🚧 In Progress
 
-| Feature                       | Progress              |
-|------------------------------|-----------------------|
-| DFS, Bellman-Ford, Floyd-Warshall | ![70%](https://img.shields.io/badge/progress-70%25-blue) |
-| Enhanced A* Heuristics       | ![60%](https://img.shields.io/badge/progress-60%25-green) |
-| Export / Import Graph        | ![20%](https://img.shields.io/badge/progress-20%25-yellow) |
-| Custom Node/Edge Appearance  | ![60%](https://img.shields.io/badge/progress-60%25-pink) |
-| Performance Optimizations    | ![70%](https://img.shields.io/badge/progress-70%25-purple) |
-| Accessibility Improvements   | ![20%](https://img.shields.io/badge/progress-20%25-lightgrey) |
-| Better Error Handling        | ![60%](https://img.shields.io/badge/progress-60%25-cyan) |
-
+| Feature                           | Progress                                                      |
+| --------------------------------- | ------------------------------------------------------------- |
+| DFS, Bellman-Ford, Floyd-Warshall | ![70%](https://img.shields.io/badge/progress-70%25-blue)      |
+| Enhanced A\* Heuristics           | ![60%](https://img.shields.io/badge/progress-60%25-green)     |
+| Export / Import Graph             | ![20%](https://img.shields.io/badge/progress-20%25-yellow)    |
+| Custom Node/Edge Appearance       | ![60%](https://img.shields.io/badge/progress-60%25-pink)      |
+| Performance Optimizations         | ![70%](https://img.shields.io/badge/progress-70%25-purple)    |
+| Accessibility Improvements        | ![20%](https://img.shields.io/badge/progress-20%25-lightgrey) |
+| Better Error Handling             | ![60%](https://img.shields.io/badge/progress-60%25-cyan)      |
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Area            | Tools                                 |
-|-----------------|--------------------------------------|
-| 🖥 Frontend      | React                                |
-| 💅 Styling       | Tailwind CSS, Material UI            |
-| 🎨 Icons         | React Icons                          |
-| ⚙️ Build         | Vite                                 |
-| 📊 Visualization | SVG                                  |
-| 🔁 State Mgmt    | React Hooks                          |
+| Area             | Tools                     |
+| ---------------- | ------------------------- |
+| 🖥 Frontend       | React                     |
+| 💅 Styling       | Tailwind CSS, Material UI |
+| 🎨 Icons         | React Icons               |
+| ⚙️ Build         | Vite                      |
+| 📊 Visualization | SVG                       |
+| ↻ State Mgmt     | React Hooks               |
 
 ---
 
@@ -128,14 +168,14 @@ Then open your browser and navigate to [http://localhost:5173](http://localhost:
 2. **Connect Nodes:** Click and drag from one node to another to create edges. Double-click edge weights to edit them.
 3. **Select Source/Destination:** Double-click a node to set it as the source, then double-click another node to set as destination. Temporary messages will confirm your selection.
 4. **Choose Graph Type:** Use the dropdown to switch between directed and undirected graphs.
-5. **Select Algorithm:** Use the dropdown to choose Dijkstra, BFS, or A*.
+5. **Select Algorithm:** Use the dropdown to choose Dijkstra, BFS, or A\*.
 6. **Start Animation:** Click "Start" to visualize the algorithm. Use the play/pause/reset controls as needed.
 7. **Step Mode:** Enable "Steps" to manually advance the algorithm using the "Next Step" button.
 8. **View Results:** The shortest path and its total distance will be displayed in the left panel.
 
 ---
 
-## 🧩 File Structure
+## 🪩 File Structure
 
 ```
 src/
@@ -185,7 +225,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 📫 Contact
+## 📢 Contact
 
 Have questions or feedback?  
 📬 Reach out via [GitHub Issues](https://github.com/nem-web/SmartRoute/issues) or create a pull request!
