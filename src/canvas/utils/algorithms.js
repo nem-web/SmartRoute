@@ -8,6 +8,16 @@ function buildDijkstraTable(graph, dist, prev) {
   }));
 }
 
+export function buildAdjacencyList(graph) {
+  // Returns: [{ node: 1, neighbors: ["2(5)", "3(2)"] }, ...]
+  return Object.keys(graph).map((node) => ({
+    node: Number(node),
+    neighbors: (graph[node] || []).map(
+      (n) => `${n.node}(${n.weight})`
+    ),
+  }));
+}
+
 export function buildGraph(nodes, edges, isDirected = false) {
   const graph = {};
 
@@ -146,6 +156,10 @@ export function bfsShortestPath(graph, startId, endId) {
     steps.push({
       queue: queue.map(p => p.join("→")),
       log: `Visiting ${node}`,
+      table: buildBfsTable(visited), 
+      currentNode: node,
+      prevNode: path.length > 1 ? path[path.length - 2] : null,
+      neighbors: (graph[node] || []).map(n => n.node),
       queue: pq.toArray(),
     });
 
@@ -177,6 +191,15 @@ export function bfsShortestPath(graph, startId, endId) {
   }
 
   return { steps, path: foundPath, distance: totalDistance };
+}
+
+export function buildBfsTable(visitedSet) {
+  return Array.from(visitedSet).map(node => ({
+    node,
+    distance: "-", // BFS doesn't track distance by default, add if you do
+    parent: "-",   // BFS doesn't track parent by default, add if you do
+    neighbors: "-",// Optional
+  }));
 }
 
 

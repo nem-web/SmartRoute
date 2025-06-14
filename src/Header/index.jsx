@@ -82,11 +82,11 @@ export const Header = ({ setShowPopup, setAnchorEl, setPopupType }) => {
               type="button"
               onClick={(e) => {
                 setAnchorEl(e.currentTarget);
-                setPopupType("priority");
+                setPopupType("adjacency");
                 setShowPopup(true);
               }}
             >
-              Show queue
+              Adjacency List
             </Button>
           </div>
         </div>

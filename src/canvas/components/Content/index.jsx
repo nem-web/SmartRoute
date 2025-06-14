@@ -5,6 +5,7 @@ import { VscDebugRestart } from "react-icons/vsc";
 import GraphCanvas from "../GraphCanvas";
 import Header from "../../../Header";
 import {
+  buildAdjacencyList,
   astar,
   bfsShortestPath,
   buildGraph,
@@ -31,6 +32,8 @@ const Content = () => {
   const [currentQueue, setCurrentQueue] = useState([]);
 
   const [isDirected, setIsDirected] = useState(false);
+
+  const [adjacencyListRows, setAdjacencyListRows] = useState([]);
 
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -188,6 +191,10 @@ const Content = () => {
     currentStepRef.current = 0;
 
     const graph = buildGraph(nodes, edges, isDirected);
+
+    const adjList = buildAdjacencyList(graph);
+    setAdjacencyListRows(adjList);
+
     setIsPlaying(true);
     setIsPaused(false);
 
@@ -442,6 +449,25 @@ const Content = () => {
                     </>
                   )}
                 </div>
+                <hr />
+                <div>
+                  <strong>Priority Queue:</strong>
+                  <div className="mt-1 font-mono text-xs leading-relaxed text-gray-700">
+                    <ul className="text-xs list-disc list-inside">
+                      {currentQueue.length === 0 ? (
+                        <li className="text-gray-400">Queue is empty.</li>
+                      ) : (
+                        currentQueue.map((item, idx) => (
+                          <li key={idx} className="mb-[.2rem]">
+                            {typeof item === "object"
+                              ? JSON.stringify(item)
+                              : String(item)}
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -478,8 +504,7 @@ const Content = () => {
                 setShowPopup={setShowPopup}
                 popupType={popupType}
                 logMessages={logMessages}
-                queue={currentQueue}
-                fullQueue={fullPriorityQueue}
+                adjacencyListRows={adjacencyListRows}
               />
             </div>
           </div>

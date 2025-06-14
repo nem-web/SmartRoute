@@ -37,8 +37,7 @@ const GraphCanvas = ({
   setShowPopup,
   popupType,
   logMessages,
-  queue,
-  fullQueue,
+  adjacencyListRows = [],
 }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [draggingNodeId, setDraggingNodeId] = useState(null);
@@ -156,7 +155,7 @@ const GraphCanvas = ({
           id={showPopup ? "transition-popper" : undefined}
           open={showPopup}
           anchorEl={anchorEl}
-          placement="bottom-start"
+          placement="bottom-end"
           transition
           modifiers={[
             {
@@ -168,7 +167,7 @@ const GraphCanvas = ({
             },
             {
               name: "flip",
-              enabled: true,
+              enabled: false,
             },
           ]}
         >
@@ -205,7 +204,7 @@ const GraphCanvas = ({
                 {popupType === "table" ? (
                   <TableContainer
                     component={Paper}
-                    className="max-h-[400px] overflow-y-auto rounded-[.6rem]"
+                    className="mc-table max-h-[400px] overflow-y-auto rounded-[.6rem] "
                   >
                     <Table
                       sx={{ minWidth: 300 }}
@@ -271,22 +270,61 @@ const GraphCanvas = ({
                     </ul>
                   </Box>
                 ) : (
-                  <Box className="max-h-[400px] overflow-y-auto p-[.3rem]">
-                    <h4 className="font-bold mb-[.2rem]">Priority queue</h4>
-                    <ul className="text-xs">
-                      {queue.length === 0 ? (
-                        <li className="text-gray-400">Queue is empty.</li>
-                      ) : (
-                        queue.map((item, idx) => (
-                          <li key={idx} className="mb-[.2rem]">
-                            {typeof item === "object"
-                              ? JSON.stringify(item)
-                              : String(item)}
-                          </li>
-                        ))
-                      )}
-                    </ul>
-                  </Box>
+                  <TableContainer
+                    component={Paper}
+                    className="max-h-[400px] overflow-y-auto rounded-[.6rem]"
+                  >
+                    <Table
+                      sx={{ minWidth: 300 }}
+                      size="small"
+                      aria-label="adjacency list table"
+                    >
+                      <TableHead>
+                        <TableRow>
+                          <TableCell
+                            sx={{ width: "30%" }}
+                            className="!font-[600]"
+                          >
+                            Node
+                          </TableCell>
+
+                          <TableCell
+                            sx={{ width: "70%" }}
+                            align="start"
+                            className="!font-[600]"
+                          >
+                            Neighbors (weight)
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {adjacencyListRows.map((row) => (
+                          <TableRow
+                            key={row.node}
+                            sx={{
+                              "&:last-child td, &:last-child th": {
+                                border: 0,
+                              },
+                            }}
+                          >
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              align="start"
+                              sx={{ width: "30%" }}
+                            >
+                              {row.node}
+                            </TableCell>
+                            <TableCell sx={{ width: "70%" }} align="start">
+                              {row.neighbors.length
+                                ? row.neighbors.join(", ")
+                                : "-"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 )}
               </Box>
             </Fade>
