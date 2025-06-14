@@ -1,4 +1,5 @@
-// src/utils/graphUtils.js
+// ✅ FINAL UPDATED graphUtils.js FILE
+
 function buildDijkstraTable(graph, dist, prev) {
   return Object.keys(graph).map((node) => ({
     node: Number(node),
@@ -9,7 +10,6 @@ function buildDijkstraTable(graph, dist, prev) {
 }
 
 export function buildAdjacencyList(graph) {
-  // Returns: [{ node: 1, neighbors: ["2(5)", "3(2)"] }, ...]
   return Object.keys(graph).map((node) => ({
     node: Number(node),
     neighbors: (graph[node] || []).map(
@@ -20,23 +20,19 @@ export function buildAdjacencyList(graph) {
 
 export function buildGraph(nodes, edges, isDirected = false) {
   const graph = {};
-
   nodes.forEach((node) => {
     graph[node.id] = [];
   });
-
   edges.forEach((edge) => {
     const { from, to, weight } = edge;
     graph[from].push({ node: to, weight });
-    if(!isDirected) {
-      graph[to].push({ node: from, weight }); // If undirected
+    if (!isDirected) {
+      graph[to].push({ node: from, weight });
     }
   });
-
   return graph;
 }
 
-// dijkstra table
 export function dijkstraTable(graph, startId) {
   const dist = {};
   const prev = {};
@@ -66,24 +62,14 @@ export function dijkstraTable(graph, startId) {
     }
   }
 
-  // Build the table
-  return Object.keys(graph).map((node) => ({
-    node: Number(node),
-    distance: dist[node] === Infinity ? "∞" : dist[node],
-    parent: prev[node] !== null ? Number(prev[node]) : "-",
-    neighbors: (graph[node] || []).map(n => Number(n.node)),
-  }));
+  return buildDijkstraTable(graph, dist, prev);
 }
 
-
-
-// Dijkstra's Algorithm for Shortest Path
 export function dijkstra(graph, startId, endId) {
   const dist = {};
   const prev = {};
   const pq = new MinHeap();
-  const visited = new Set(); // <-- To track finalized nodes
-
+  const visited = new Set();
   const steps = [];
 
   for (const node in graph) {
@@ -96,13 +82,10 @@ export function dijkstra(graph, startId, endId) {
 
   while (!pq.isEmpty()) {
     const [currentNode, currentDist] = pq.extractMin();
-
-    if (visited.has(currentNode)) continue; // skip if already finalized
-    visited.add(currentNode); // mark as finalized
+    if (visited.has(currentNode)) continue;
+    visited.add(currentNode);
 
     const prevNode = prev[currentNode];
-
-    // find neighbors for pink highlight
     const neighbors = (graph[currentNode] || []).map(n => n.node);
 
     for (const neighborData of graph[currentNode] || []) {
@@ -112,7 +95,6 @@ export function dijkstra(graph, startId, endId) {
         dist[neighbor] = newDist;
         prev[neighbor] = currentNode;
         pq.insert([neighbor, newDist]);
-        // ⛔️ Don't log here, only log when a node is *visited* (i.e., extracted)
       }
     }
 
@@ -121,12 +103,11 @@ export function dijkstra(graph, startId, endId) {
       log: `Visiting ${currentNode}`,
       currentNode: Number(currentNode),
       prevNode: prevNode !== null ? Number(prevNode) : null,
-      neighbors: (graph[currentNode] || []).map(n => Number(n.node)),
+      neighbors,
       table: buildDijkstraTable(graph, { ...dist }, { ...prev }),
     });
   }
 
-  // Reconstruct path
   const path = [];
   let current = endId;
   while (current !== null) {
@@ -134,33 +115,33 @@ export function dijkstra(graph, startId, endId) {
     current = prev[current];
   }
 
-  if(path.length === 1 && String(path[0]) !== String(startId) || dist[endId] === Infinity || prev[endId] === null && String(startId) !== String(endId)) {
-    return { steps, path: null, distance: null};
+  if (path.length === 1 && String(path[0]) !== String(startId) || dist[endId] === Infinity || prev[endId] === null && String(startId) !== String(endId)) {
+    return { steps, path: null, distance: null };
   }
 
   return { steps, path, distance: dist[endId] };
 }
 
-
-// BFS Shortest Path
 export function bfsShortestPath(graph, startId, endId) {
   const queue = [[startId]];
   const visited = new Set([startId]);
   const steps = [];
   let foundPath = null;
+  const parent = {};
 
   while (queue.length > 0) {
     const path = queue.shift();
     const node = path[path.length - 1];
+    const neighbors = (graph[node] || []).map(n => n.node);
+    const prevNode = path.length > 1 ? path[path.length - 2] : null;
 
     steps.push({
       queue: queue.map(p => p.join("→")),
       log: `Visiting ${node}`,
-      table: buildBfsTable(visited), 
+      table: buildBfsTable(visited, parent),
       currentNode: node,
-      prevNode: path.length > 1 ? path[path.length - 2] : null,
-      neighbors: (graph[node] || []).map(n => n.node),
-      queue: pq.toArray(),
+      prevNode,
+      neighbors,
     });
 
     if (String(node) === String(endId)) {
@@ -172,6 +153,7 @@ export function bfsShortestPath(graph, startId, endId) {
       const neighbor = neighborObj.node;
       if (!visited.has(neighbor)) {
         visited.add(neighbor);
+        parent[neighbor] = node;
         queue.push([...path, neighbor]);
       }
     }
@@ -181,7 +163,6 @@ export function bfsShortestPath(graph, startId, endId) {
     return { steps, path: null, distance: null };
   }
 
-  // Calculate total distance (sum of weights along the path)
   let totalDistance = 0;
   for (let i = 1; i < foundPath.length; i++) {
     const from = foundPath[i - 1];
@@ -193,19 +174,15 @@ export function bfsShortestPath(graph, startId, endId) {
   return { steps, path: foundPath, distance: totalDistance };
 }
 
-export function buildBfsTable(visitedSet) {
+export function buildBfsTable(visitedSet, parentMap) {
   return Array.from(visitedSet).map(node => ({
     node,
-    distance: "-", // BFS doesn't track distance by default, add if you do
-    parent: "-",   // BFS doesn't track parent by default, add if you do
-    neighbors: "-",// Optional
+    distance: "-",
+    parent: parentMap?.[node] ?? "-",
+    neighbors: "-",
   }));
 }
 
-
-
-
-// Priority Queue
 export class MinHeap {
   constructor() {
     this.heap = [];
@@ -229,7 +206,6 @@ export class MinHeap {
   extractMin() {
     if (this.heap.length === 0) return null;
     if (this.heap.length === 1) return this.heap.pop();
-
     const min = this.heap[0];
     this.heap[0] = this.heap.pop();
     this.sinkDown(0);
@@ -242,15 +218,9 @@ export class MinHeap {
       let left = 2 * i + 1;
       let right = 2 * i + 2;
       let smallest = i;
-
-      if (left < length && this.heap[left][1] < this.heap[smallest][1]) {
-        smallest = left;
-      }
-      if (right < length && this.heap[right][1] < this.heap[smallest][1]) {
-        smallest = right;
-      }
+      if (left < length && this.heap[left][1] < this.heap[smallest][1]) smallest = left;
+      if (right < length && this.heap[right][1] < this.heap[smallest][1]) smallest = right;
       if (smallest === i) break;
-
       [this.heap[i], this.heap[smallest]] = [this.heap[smallest], this.heap[i]];
       i = smallest;
     }
@@ -261,20 +231,14 @@ export class MinHeap {
   }
 
   snapshot() {
-  return [...this.heap]
-    .sort((a, b) => a[1] - b[1])
-    .map(([node, dist]) => `${node}(${dist})`);
-}
+    return [...this.heap].sort((a, b) => a[1] - b[1]).map(([node, dist]) => `${node}(${dist.toFixed(2)})`);
+  }
 
   toArray() {
     return this.heap.map(([id, dist]) => `${id}(${dist})`);
   }
-  
 }
 
-// ...existing code...
-
-// Heuristic: Euclidean distance (if nodes have x, y)
 function heuristic(nodeA, nodeB, nodeCoords) {
   if (!nodeCoords[nodeA] || !nodeCoords[nodeB]) return 0;
   const dx = nodeCoords[nodeA].x - nodeCoords[nodeB].x;
@@ -282,9 +246,7 @@ function heuristic(nodeA, nodeB, nodeCoords) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-// A* Algorithm
 export function astar(graph, startId, endId, nodes = []) {
-  // Build a map of nodeId -> {x, y}
   const nodeCoords = {};
   nodes.forEach(n => nodeCoords[n.id] = { x: n.x, y: n.y });
 
@@ -301,18 +263,23 @@ export function astar(graph, startId, endId, nodes = []) {
   }
   gScore[startId] = 0;
   fScore[startId] = heuristic(startId, endId, nodeCoords);
-
   openSet.insert([startId, fScore[startId]]);
 
   while (!openSet.isEmpty()) {
-    const [current, ] = openSet.extractMin();
-
+    const [current] = openSet.extractMin();
     if (visited.has(current)) continue;
     visited.add(current);
+
+    const neighbors = (graph[current] || []).map(n => n.node);
+    const prevNode = cameFrom[current] ?? null;
 
     steps.push({
       queue: openSet.snapshot(),
       log: `Visiting ${current}`,
+      table: buildBfsTable(visited, cameFrom),
+      currentNode: Number(current),
+      prevNode: prevNode !== null ? Number(prevNode) : null,
+      neighbors,
     });
 
     if (String(current) === String(endId)) break;
@@ -329,7 +296,6 @@ export function astar(graph, startId, endId, nodes = []) {
     }
   }
 
-  // Reconstruct path
   const path = [];
   let current = endId;
   while (current in cameFrom) {
@@ -344,7 +310,6 @@ export function astar(graph, startId, endId, nodes = []) {
     return { steps, path: null, distance: null };
   }
 
-  // Calculate total distance
   let totalDistance = 0;
   for (let i = 1; i < path.length; i++) {
     const from = path[i - 1];
@@ -355,5 +320,3 @@ export function astar(graph, startId, endId, nodes = []) {
 
   return { steps, path, distance: totalDistance };
 }
-
-

@@ -18,6 +18,7 @@ const Content = () => {
   const [destination, setDestination] = useState("");
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [weights, setWeights] = useState([]);
   const [nodeId, setNodeId] = useState(1);
   const [shortestPath, setShortestPath] = useState([]);
   const [animationSpeed, setAnimationSpeed] = useState(400);

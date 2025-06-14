@@ -245,9 +245,11 @@ const GraphCanvas = ({
                             <TableCell align="center">{row.distance}</TableCell>
                             <TableCell align="center">{row.parent}</TableCell>
                             <TableCell align="start">
-                              {row.neighbors.length
-                                ? row.neighbors.join(", ")
-                                : "-"}
+                              {Array.isArray(row.neighbors)
+                                ? row.neighbors.length
+                                  ? row.neighbors.join(", ")
+                                  : "-"
+                                : row.neighbors}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -316,9 +318,11 @@ const GraphCanvas = ({
                               {row.node}
                             </TableCell>
                             <TableCell sx={{ width: "70%" }} align="start">
-                              {row.neighbors.length
-                                ? row.neighbors.join(", ")
-                                : "-"}
+                              {Array.isArray(row.neighbors)
+                                ? row.neighbors.length
+                                  ? row.neighbors.join(", ")
+                                  : "-"
+                                : row.neighbors}
                             </TableCell>
                           </TableRow>
                         ))}
