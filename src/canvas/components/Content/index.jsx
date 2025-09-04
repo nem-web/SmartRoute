@@ -421,7 +421,7 @@ const Content = () => {
                 >
                   <option value="dijkstra">Dijkstra</option>
                   <option value="bfs">BFS</option>
-                  <option value="astar">A*</option>
+{/*                   <option value="astar">A*</option> */}
                 </select>
               </label>
 
